@@ -185,6 +185,30 @@ public class Qt5Widgets extends org.bytedeco.qt.presets.Qt5Widgets {
     public void messageClicked() {}
   }
 
+  @Name("[=](const QTextEdit *sender, const QObject *context, void (*functor)(int), int target){QObject::connect(sender, &QTextEdit::textChanged, context, [functor,target](){functor(target);});}")
+  public native static void QTextEdit_textChanged(@Const QTextEdit sender, @Const QObject context, TextChangedCallback functor, int target);
+
+  public static class TextChangedCallback extends FunctionPointer {
+    static { Loader.load(); }
+    private static List<TextChangedCallback> cbs = Collections.synchronizedList(new ArrayList<TextChangedCallback>());
+    private static AtomicInteger ids = new AtomicInteger();
+    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
+    public TextChangedCallback(Pointer p) { super(p); }
+    protected TextChangedCallback() { allocate(); id = ids.getAndIncrement(); cbs.add(id, this); }
+    protected native void allocate();
+    public int id;
+    public final void call(int target) {
+      final TextChangedCallback cb = cbs.get(target);
+      new Thread(new Runnable() {
+        @Override
+        public void run() {
+          if (cb != null) cb.textChanged();
+        }
+      }).start();
+    }
+    public void textChanged() {}
+  }
+
   @Opaque
   public static class QLayoutItem extends Pointer {
     public QLayoutItem() { super((Pointer)null); }
